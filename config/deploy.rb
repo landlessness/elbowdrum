@@ -6,7 +6,7 @@ set :git_enable_submodules, 1
 set :scm, :git
 set :scm_username, "bmulloy" 
 set :scm_passphrase, "passw0rd"
-set :repository, "git@github.com:brianmulloy/tic-toc-bloc.git"
+set :repository, "git@github.com:brianmulloy/elbowdrum.git"
 # set :deploy_via, :remote_cache
 set :user, "bmulloy2"
 set :use_sudo, false
