@@ -1,6 +1,6 @@
 #!/bin/sh
 
-/home/bmulloy2/tictocbloc/current/script/process/spawner \
+/home/bmulloy2/elbowdrum/current/script/process/spawner \
   mongrel \
   --environment=production \
   --instances=3 \

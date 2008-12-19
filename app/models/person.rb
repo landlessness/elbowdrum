@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class Person < ActiveRecord::Base
-  DEFAULT_AVATAR = 'http://www.tictocbloc.com/images/avatar.png'
+  DEFAULT_AVATAR = Rails::Initializer::TLD + '/images/avatar.png'
 
   has_many :emails
   belongs_to :current_email, :class_name => "Email"
