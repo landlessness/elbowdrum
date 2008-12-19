@@ -1,0 +1,12 @@
+<h1>Editing account_membership</h1>
+
+<% form_for(@account_membership) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @account_membership %> |
+<%= link_to 'Back', account_memberships_path %>

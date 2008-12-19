@@ -1,0 +1,2 @@
+class Promise < Item
+end

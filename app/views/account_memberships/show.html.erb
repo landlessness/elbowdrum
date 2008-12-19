@@ -1,0 +1,42 @@
+<% @title =  @account_membership.person.login + ' - ' + @account_membership.account.name %>
+<% @account =  @account_membership.account %>
+<div class="underline"><%= link_to '&laquo; back to ' + @account_membership.account.name, account_items_path(@account_membership.account) %></div>
+<div id="member_title">
+  <%= link_to(gravatar_for(@account_membership.person, :default => Person::DEFAULT_AVATAR), [@account, @account_membership]) %>
+  <%= link_to @account_membership.person.login, [@account, @account_membership] %>
+</div>
+
+<% @account_membership.items.find(:all, :order => '`for` desc').group_by(&:for).each do |day, items| %>
+  <% items_by_type = items.group_by(&:type) %>
+  <div class="member_day_container">
+    <div class="member_day">
+      <div class="member_date"><%= link_to day.strftime('%A, %B %d %Y'), account_day_path(@account, day.year, day.month, day.day) %></div>
+      <div class="member_deeds">
+        <% if items_by_type[Deed.to_s].nil? || items_by_type[Deed.to_s].empty? %>
+        <span class="empty">nothing</span>
+        <% else %>
+        <ul><%= render :partial => 'items/item', :collection => items_by_type[Deed.to_s] %></ul>
+        <% end %>
+      </div>
+      <div class="member_other">  
+        <div class="member_promises">  
+          <span class="title">Promises</span>
+          <% if items_by_type[DailyPromise.to_s].nil? || items_by_type[DailyPromise.to_s].empty? %>
+          <span class="empty">none</span>
+          <% else %>
+          <ul><%= render :partial => 'items/item', :collection => items_by_type[DailyPromise.to_s] %></ul>
+          <% end %>
+        </div>  
+        <div class="member_blockers">
+          <div class="title">Blockers</div>
+          <% if items_by_type[Blocker.to_s].nil? || items_by_type[Blocker.to_s].empty? %>
+          <span class="empty">none</span>
+          <% else %>
+          <ul><%= render :partial => 'items/item', :collection => items_by_type[Blocker.to_s] %></ul>
+          <% end %>
+        </div>
+      </div>
+      <div class="clear"></div>
+    </div>
+  </div>
+<% end %>

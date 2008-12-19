@@ -1,0 +1,5 @@
+<h3><%= @title = @account.name %></h3>
+<p class="underline"><%= link_to 'view status report', account_items_path(@account) %></p>
+<h4>People</h4>
+<%= render :partial => @account.account_memberships %>
+<p class="underline"><%= link_to '+ invite person', new_account_account_membership_path(@account) %></p>

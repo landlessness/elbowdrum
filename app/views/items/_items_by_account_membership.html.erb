@@ -1,0 +1,29 @@
+<% class_name = 'person_' + items_by_account_membership.person.id.to_s %>
+<tr>
+  <td class="person viewer underline <%= class_name %>">
+    <%= link_to(gravatar_for(items_by_account_membership.person, :default => Person::DEFAULT_AVATAR), [@account, items_by_account_membership], :onmouseover => "startHover('.#{class_name}')", :onmouseout => "stopHover('.#{class_name}')") %>
+    <br/>
+    <%= link_to items_by_account_membership.person.login, [@account, items_by_account_membership], :onmouseover => "startHover('.#{class_name}')", :onmouseout => "stopHover('.#{class_name}')" %>
+  </td>
+  <td class="viewer tertiary">
+    <%= render :partial => 'items/viewer', 
+    :locals => {:day => @day.yesterday, :account_membership => items_by_account_membership, :time_frame => :yesterday,  :item_type => DailyPromise, :items => items_by_account_membership.daily_promises.for(@day.yesterday)} %>
+  </td>
+  <td class="editor primary">
+    <%= render :partial => 'items/editor', 
+    :locals => {:day => @day.yesterday, :account_membership => items_by_account_membership, :time_frame => :today,  :item_type => Deed, :items => items_by_account_membership.deeds.for(@day.yesterday)} %>
+  </td>
+  <td class="editor primary">
+    <%= render :partial => 'items/editor', 
+    :locals => {:day => @day, :account_membership => items_by_account_membership, :time_frame => :today, :item_type => DailyPromise, :items => items_by_account_membership.daily_promises.for(@day)} %>
+  </td>
+  <td class="editor secondary">
+    <%= render :partial => 'items/editor', 
+    :locals => {:day => @day, :account_membership => items_by_account_membership, :time_frame => :today, :item_type => Blocker, :items => items_by_account_membership.blockers.for(@day)} %>
+  </td>
+  <td class="viewer tertiary">
+    <%= render :partial => 'items/viewer',
+    :locals => {:day => @day.beginning_of_week, :account_membership => items_by_account_membership, :time_frame => :week, :item_type => SprintPromise, :items => items_by_account_membership.sprint_promises.for(@day.beginning_of_week)} %>
+  </td>
+</tr>
+

@@ -1,0 +1,2 @@
+class SprintPromise < Promise
+end

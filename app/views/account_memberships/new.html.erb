@@ -1,0 +1,13 @@
+<% @title = 'Invite Person' %>
+<h3><%= @title %></h3>
+
+<% form_for(@account_membership, :url => account_account_memberships_path(@account)) do |f| %>
+<%= f.error_messages %>
+<p>
+  <%= label_tag 'email' %><br/>
+  <%= text_field_tag :email %>
+</p>
+<p>
+  <%= f.submit "Invite" %>
+</p>
+<% end %>

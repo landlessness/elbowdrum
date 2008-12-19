@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <!--[if lt IE 7]>
+     <link rel="stylesheet" type="text/css" href="ie6.css" />
+  <![endif]-->
+  <%= stylesheet_link_tag 'application' %>
+  <%= javascript_include_tag :defaults %>
+  <%= javascript_include_tag 'livepipe' %>
+  <%= javascript_include_tag 'tabs' %>
+  <%= javascript_include_tag 'hotkey' %>
+  <%= calendar_date_select_includes nil %>
+  
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title><%= @title || raise("No page title specified") %> - <%= APP_NAME %> - <%= APP_TAGLINE %></title>
+</head>
+
+<% if 'development' == Rails.env %>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<% end %>
+<script type="text/javascript">
+try {
+  var pageTracker = _gat._getTracker("UA-6590971-1");
+  pageTracker._trackPageview();
+  } catch(err) {}</script>
+
+  <body>
+    <div id="container">
+      <div id="header"></div>
+      <div id="nav">    
+        <div id="left_nav" class="action" >
+          <ul>
+            <% if logged_in? %>
+            <li><%= link_to 'home', root_path %></li>
+            <% end %>        
+          </ul>
+        </div>
+        <div id="right_nav" class="action">
+          <ul>
+            <% if logged_in? %>
+            <li><%= link_to 'settings', edit_person_path(current_person) %></li>
+            <li><%= link_to 'sign out', logout_path %></li>
+            <% else %>
+            <li><%= link_to 'sign in', login_path %></li>
+            <li><%= link_to 'sign up', signup_path %></li>
+            <% end %>        
+          </ul>
+        </div>
+      </div>    
+      <div class="clear"></div>
+      <div id="flash">
+        <p class="notice"><%= flash[:notice] %></p>
+        <p class="error"><%= flash[:error] %></p>
+      </div>
+      <div><%= yield  %></div>
+      <div id="push"></div>
+    </div>
+    <div id="footer">
+      <%= render :partial => 'layouts/footer' %>
+    </div>
+  </body>
+  </html>

@@ -1,0 +1,2 @@
+page.insert_html :bottom, :"#{element_id(@account_membership, :today, @item.class, 'list')}", :partial => 'item', :object => @item
+page[element_id(@account_membership, :today, @item.class, 'text')].value = ''

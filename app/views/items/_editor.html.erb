@@ -1,0 +1,9 @@
+<div class="editor_form">
+<% remote_form_for [@account, account_membership, Item.new(:for => day)] do |f| %>
+<%= f.hidden_field :for %>
+<%= f.hidden_field :type, :value => item_type.to_s %>
+<%= f.hidden_field :created_by_id, :value => current_person.id %>
+<%= f.text_field :text, :id => element_id(account_membership, time_frame, item_type, 'text'), :class => 'editor_text', :size => 0 %>
+<% end %>
+</div>
+<%= render :partial => 'items/viewer', :locals => {:account_membership => account_membership, :time_frame => time_frame, :item_type => item_type, :items => items} %>

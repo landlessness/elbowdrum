@@ -1,0 +1,13 @@
+<% @title = 'Email Confirmation' %>
+<h3><%= @title %></h3>
+<p>
+<%= @message %>
+</p>
+<p id="activated" class="underline">
+  <% if current_person %>
+  Check your <%= link_to 'settings', edit_person_path(current_person) %> if you want to double check.<br/>
+  Or <%= link_to 'get started', new_person_thought_path(current_person) %>
+  <% else %>
+  <%= link_to 'Sign in', login_path %> to get started.
+  <% end %>
+</p>

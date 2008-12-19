@@ -1,0 +1,19 @@
+<% @title = @account.name %>
+<table>
+  <thead>
+    <tr>
+      <th class="viewer" id="calendar_cell" rowspan="2"><%= render :partial => 'calendar' %></th>
+      <th colspan="5" id="account_name"><%= link_to @account.name, @account %></th>
+    </tr>
+    <tr>
+      <th class="viewer tertiary">Yesterday's Promises</th>
+      <th class="primary">Yesterday<br/><span class="subdued">What I did yesterday</span></th>
+      <th class="primary">Today<br/><span class="subdued">What I promise to do today</span></th>
+      <th id="blocker-header" class="secondary">Blockers<br/><span class="subdued">What is blocking me</span></th>
+      <th class="viewer tertiary">This Week's Promises</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= render :partial => 'items_by_account_membership', :collection => @account.account_memberships %>
+  </tbody>
+</table>

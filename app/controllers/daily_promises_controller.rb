@@ -1,0 +1,2 @@
+class DailyPromisesController < ItemsController
+end

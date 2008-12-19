@@ -1,0 +1,6 @@
+<div class="underline">
+  <%= link_to(gravatar_for(account_membership.person, :default => Person::DEFAULT_AVATAR), [@account, account_membership]) %>
+  <%= link_to account_membership.person.login, account_membership.person %>
+  <%= time_ago_in_words account_membership.created_at %> ago
+  <%= account_membership.created_at.strftime('%m/%d/%Y') %>
+</div>
