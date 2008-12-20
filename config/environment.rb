@@ -7,7 +7,7 @@
 # Specifies gem version of Rails to use when vendor/rails is not present
 RAILS_GEM_VERSION = '2.2.2' unless defined? RAILS_GEM_VERSION
 APP_NAME = 'Elbow Drum'
-APP_TAGLINE = 'Status updates for project teams'
+APP_TAGLINE = 'a rhythm keeper for project teams'
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
