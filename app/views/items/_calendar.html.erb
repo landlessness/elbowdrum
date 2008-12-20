@@ -1,27 +1,27 @@
 
 <div id="calendar">
   <div id="month">
-    <%= @day.strftime('%b') %>
+    <%= @local_day.strftime('%b') %>
   </div>
   <div id="day">
     <div id="weekday">
       <table>
         <tr>
           <td id="nav-yesterday">
-            <%= link_to '&laquo;', account_day_path(@account, @day.yesterday.year, @day.yesterday.month, @day.yesterday.day) %>
+            <%= link_to '&laquo;', account_day_path(@account, @local_day.yesterday.year, @local_day.yesterday.month, @local_day.yesterday.day) %>
           </td>
           <td id="nav-today">
-            <span id="day_of_week"><%= @day.strftime '%a' %></span>            
+            <span id="day_of_week"><%= @local_day.strftime '%a' %></span>            
           </td>
           <td id="nav-tomorrow">
-            <%= link_to '&raquo;', account_day_path(@account, @day.tomorrow.year, @day.tomorrow.month, @day.tomorrow.day) %>            
+            <%= link_to '&raquo;', account_day_path(@account, @local_day.tomorrow.year, @local_day.tomorrow.month, @local_day.tomorrow.day) %>            
           </td>
         </tr>
       </table>
     </div>
     <div id="day_number">
-      <%= link_to_function @day.strftime('%e'), "new CalendarDateSelect( 'calendar_date_select', {before_close:function(param) { document.location = '/accounts/#{@account.id}/items/' + this.calendar_date_select.selected_date.getFullYear() + '/' + (this.calendar_date_select.selected_date.getMonth()+1) + '/' + this.calendar_date_select.selected_date.getDate(); }, year_range:10} );" %>
-      <%= text_field_tag :calendar_date_select,  @day.strftime('%Y/%m/%d') %>
+      <%= link_to_function @local_day.strftime('%e'), "new CalendarDateSelect( 'calendar_date_select', {before_close:function(param) { document.location = '/accounts/#{@account.id}/items/' + this.calendar_date_select.selected_date.getFullYear() + '/' + (this.calendar_date_select.selected_date.getMonth()+1) + '/' + this.calendar_date_select.selected_date.getDate(); }, year_range:10} );" %>
+      <%= text_field_tag :calendar_date_select,  @local_day.strftime('%Y/%m/%d') %>
     </div>
   </div>
 </div>

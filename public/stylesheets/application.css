@@ -207,10 +207,10 @@ table
 .editor_text {
   width: 100%;
 }
-#account_name a {
+#items_account_name a {
   color: #fff;
 }
-#account_name {
+#items_account_name {
   font-size: 175%;
   text-align: left;
   background-color: #333;

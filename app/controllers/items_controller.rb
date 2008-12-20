@@ -4,7 +4,8 @@ class ItemsController < ApplicationController
   def index
     @account = current_person.accounts.find(params[:account_id])
     ymd = params.values_at :year, :month, :day
-    @day = ymd.all? ? Time.zone.local(*ymd) : Time.zone.now.beginning_of_day
+    @day = ymd.all? ? Time.local(*ymd) : Time.now.beginning_of_day
+    @local_day = ymd.all? ? Time.zone.local(*ymd) : Time.zone.now.beginning_of_day
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @account }

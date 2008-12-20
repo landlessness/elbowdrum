@@ -17,3 +17,5 @@ config.action_controller.perform_caching             = false
 config.action_mailer.raise_delivery_errors = false
 
 Rails::Initializer::TLD = 'localhost:3000'
+
+config.time_zone = 'Pacific Time (US & Canada)'
