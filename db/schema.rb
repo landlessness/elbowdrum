@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(:version => 20081211051003) do
     t.datetime "remember_token_expires_at"
     t.string   "state",                                    :default => "passive"
     t.datetime "deleted_at"
+    t.string   "time_zone"
     t.integer  "current_email_id"
   end
 

@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :people, :member => { :suspend   => :put, :unsuspend => :put, :purge => :delete }
+  map.resources :people, :member => { :suspend   => :put, :unsuspend => :put, :purge => :delete, :edit_email => :get, :edit_password => :get }
 
   map.resources :accounts do |a|
     a.resources :account_memberships do |m|

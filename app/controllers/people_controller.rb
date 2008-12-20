@@ -124,7 +124,7 @@ class PeopleController < ApplicationController
     success = current_person.update_attributes(params[:person])
     if success
       flash[:notice] = 'Successfully updated settings'
-      redirect_to home_url
+      redirect_to root_url
     else
       flash[:error] = 'Settings were not updated'
       render :action => 'edit'

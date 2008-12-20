@@ -11,6 +11,7 @@ class CreatePeople < ActiveRecord::Migration
       t.column :remember_token_expires_at, :datetime
       t.column :state,                     :string, :null => :no, :default => 'passive'
       t.column :deleted_at,                :datetime
+      t.string :time_zone
       t.references :current_email
     end
     add_index :people, :login, :unique => true

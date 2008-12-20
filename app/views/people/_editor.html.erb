@@ -1,0 +1,42 @@
+<% editor.password = editor.password_confirmation = nil %>
+
+<%= error_messages_for :person %>
+<% form_for editor, :url => (editor.new_record?) ? people_path : person_path(editor), :html => { :id => 'signup' } do |f| -%>
+
+<% if editor.new_record? %>
+<p><%= label_tag 'email' %>  <span class="valid" id="email_valid">&nbsp;</span><br/>
+<%= f.text_field :email %></p>
+<% else %>
+<div><%= label_tag 'email' %></div>
+<div class="crumple_email"><%= editor.email %> <span class="edit_setting action"><%= link_to 'edit', edit_email_person_path(editor) %></span></div>
+<% end %>
+
+<% if editor.new_record? %>
+<p>
+  <%= label_tag 'password' %><br/>
+  <%= f.password_field :password %>
+</p>
+<p>
+  <%= label_tag 'password_confirmation', 'Confirm Password' %><br/>
+  <%= f.password_field :password_confirmation %>
+</p>
+<% else %>
+<div><%= label_tag 'password' %></div>
+<div class="crumple_email">
+  ******** <span class="edit_setting action"><%= link_to 'edit', edit_password_person_path(editor) %></span>
+</div>
+<% end %>
+<p>
+  <%= label_tag 'screen name' %> <span class="valid" id="login_valid">&nbsp;</span><br/>
+  <%= f.text_field :login %>
+</p>
+
+<p>
+  <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :default => "Eastern Time (US & Canada)" %>
+</p>
+<p><%= link_to 'cancel', :back %> <%= submit_tag (editor.new_record?) ? 'Sign up' : 'Save' %></p>
+<% end -%>
+
+<%= observe_field 'person_login', :url => { :action => :login_valid }, :frequency => 0.25, :update => 'login_valid', :with => 'login' %>
+<%= observe_field 'person_login', :frequency => 0.25, :function => 'auto_populate_crumple_email()' %>
+<%= observe_field 'person_email', :url => { :action => :email_valid }, :frequency => 0.25, :update => 'email_valid', :with => 'email' if editor.new_record? %>
