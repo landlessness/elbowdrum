@@ -25,7 +25,7 @@ class AccountsController < ApplicationController
   # GET /accounts/new.xml
   def new
     @account = current_person.accounts.new
-
+    @screen_name = current_person.default_screen_name
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @account }
@@ -42,7 +42,7 @@ class AccountsController < ApplicationController
   def create
     @account = current_person.accounts.new(params[:account])
     account_membership = @account.account_memberships.build :person => current_person,
-      :account => @account, :administrator => true
+      :account => @account, :administrator => true, :screen_name => params[:screen_name]
     respond_to do |format|
       if @account.save
         flash[:notice] = 'Account was successfully created.'

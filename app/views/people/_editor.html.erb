@@ -27,16 +27,9 @@
 </div>
 <% end %>
 <p>
-  <%= label_tag 'screen name' %> <span class="valid" id="login_valid">&nbsp;</span><br/>
-  <%= f.text_field :login %>
-</p>
-
-<p>
   <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, :default => "Eastern Time (US & Canada)" %>
 </p>
 <p><%= link_to 'cancel', :back %> <%= submit_tag (editor.new_record?) ? 'Sign up' : 'Save' %></p>
 <% end -%>
 
-<%= observe_field 'person_login', :url => { :action => :login_valid }, :frequency => 0.25, :update => 'login_valid', :with => 'login' %>
-<%= observe_field 'person_login', :frequency => 0.25, :function => 'auto_populate_crumple_email()' %>
 <%= observe_field 'person_email', :url => { :action => :email_valid }, :frequency => 0.25, :update => 'email_valid', :with => 'email' if editor.new_record? %>

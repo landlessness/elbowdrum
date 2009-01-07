@@ -3,13 +3,24 @@ class ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    @account = params[:account_id] ? current_person.accounts.find(params[:account_id]) : current_person.default_account
+    @account = current_person.accounts.find(params[:account_id])
     ymd = params.values_at :year, :month, :day
     @day = ymd.all? ? Time.local(*ymd) : Time.now.beginning_of_day
     @local_day = ymd.all? ? Time.zone.local(*ymd) : Time.zone.now.beginning_of_day
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @account }
+    end
+  end
+
+  def default
+    @account = current_person.default_account
+    @day = Time.now.beginning_of_day
+    @local_day = Time.zone.now.beginning_of_day
+    if @account
+      render :action => 'index'
+    else
+      redirect_to :controller => 'accounts' 
     end
   end
 

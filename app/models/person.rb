@@ -18,10 +18,10 @@ class Person < ActiveRecord::Base
   include Authentication::ByPassword
   include Authentication::ByCookieToken
   include Authorization::AasmRoles
-  validates_presence_of     :login
-  validates_length_of       :login,    :within => 3..40
-  validates_uniqueness_of   :login,    :message => 'that screen name has already been taken'
-  validates_format_of       :login,    :with => /^[A-Z0-9._%+-]+$/i, :message => 'screen name should have no spaces'
+  # validates_presence_of     :login
+  # validates_length_of       :login,    :within => 3..40
+  # validates_uniqueness_of   :login,    :message => 'that screen name has already been taken'
+  # validates_format_of       :login,    :with => /^[A-Z0-9._%+-]+$/i, :message => 'screen name should have no spaces'
 
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100
@@ -68,6 +68,11 @@ class Person < ActiveRecord::Base
   def default_account
     current_account || accounts.first
   end
+  
+  def default_screen_name
+    email.split('@').first
+  end
+  
   protected
 
   def make_activation_code

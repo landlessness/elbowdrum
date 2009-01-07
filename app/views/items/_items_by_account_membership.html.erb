@@ -3,7 +3,7 @@
   <td class="person viewer underline <%= class_name %>">
     <%= link_to(gravatar_for(items_by_account_membership.person, :default => Person::DEFAULT_AVATAR), [@account, items_by_account_membership], :onmouseover => "startHover('.#{class_name}')", :onmouseout => "stopHover('.#{class_name}')") %>
     <br/>
-    <%= link_to items_by_account_membership.person.login, [@account, items_by_account_membership], :onmouseover => "startHover('.#{class_name}')", :onmouseout => "stopHover('.#{class_name}')" %>
+    <%= link_to items_by_account_membership.screen_name, [@account, items_by_account_membership], :onmouseover => "startHover('.#{class_name}')", :onmouseout => "stopHover('.#{class_name}')" %>
   </td>
   <td class="viewer tertiary">
     <%= render :partial => 'items/viewer', 

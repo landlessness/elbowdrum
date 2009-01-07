@@ -2,13 +2,18 @@
 <h1>New account</h1>
 
 <% form_for(@account) do |f| %>
-  <%= f.error_messages %>
-  <p><%= label_tag 'name' %><br />
-  <%= f.text_field :name %></p>
-  
-  <p>
-    <%= f.submit "Create" %>
-  </p>
+<%= f.error_messages %>
+<p><%= label_tag 'Project name' %><br />
+  <%= f.text_field :name %>
+</p>
+
+<p><%= label_tag 'My project screen name' %><br />
+  <%= text_field_tag :screen_name, @screen_name %>
+</p>
+
+<p>
+  <%= f.submit "Create" %>
+</p>
 <% end %>
 
 <%= link_to 'Back', accounts_path %>
