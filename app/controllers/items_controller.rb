@@ -2,7 +2,7 @@ class ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    @account = current_person.accounts.find(params[:account_id])
+    @account = params[:account_id] ? current_person.accounts.find(params[:account_id]) : current_person.default_account
     ymd = params.values_at :year, :month, :day
     @day = ymd.all? ? Time.local(*ymd) : Time.now.beginning_of_day
     @local_day = ymd.all? ? Time.zone.local(*ymd) : Time.zone.now.beginning_of_day

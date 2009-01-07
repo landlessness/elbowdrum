@@ -26,7 +26,6 @@ class Person < ActiveRecord::Base
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100
 
-
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
@@ -66,6 +65,9 @@ class Person < ActiveRecord::Base
     self.deleted_at = nil
   end
   
+  def default_account
+    current_account || accounts.first
+  end
   protected
 
   def make_activation_code
