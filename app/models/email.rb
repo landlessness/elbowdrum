@@ -1,4 +1,5 @@
 class Email < ActiveRecord::Base
+  include Authentication
   include AASM
   belongs_to :person
 
