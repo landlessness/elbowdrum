@@ -1,12 +1,13 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :people, :member => { :suspend   => :put, :unsuspend => :put, :purge => :delete, :edit_email => :get, :edit_password => :get }
 
+  map.resources :teams do |t|
+    t.resources :team_memberships
+  end
+
   map.resources :accounts do |a|
     a.resources :account_memberships do |m|
       m.resources :items
-    end
-    a.resources :teams do |t|
-      t.resources :team_memberships
     end
     a.resources :items
     a.day 'items/:year/:month/:day', :controller => 'items',

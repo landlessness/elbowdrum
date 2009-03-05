@@ -1,21 +1,24 @@
 login: &login
   username: bmulloy2_bmulloy
-  password: passw0rd
   adapter: mysql
   host: localhost
 
 production:
   database: bmulloy2_prod
+  password: bcpSImUQTGQ
   <<: *login
 
 staging:
   database: bmulloy2_stage
+  password: passw0rd
   <<: *login
 
 development:
   database: bmulloy2_dev
+  password: passw0rd
   <<: *login
   
 test:
   database: bmulloy2_test
+  password: passw0rd
   <<: *login
