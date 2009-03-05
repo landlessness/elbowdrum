@@ -35,7 +35,6 @@ set :database_name , "bmulloy2_prod" # !NOTE! this is limited to 9 characters
 
 set :user , "root"
 set :domain_password, "i7y5EMftO4E"
-set :database_password, "bcpSImUQTGQ"
 set :deploy_to, "/home/admin/#{application}"
 set :shared_directory, "#{deploy_to}/shared"
 set :use_sudo, false
@@ -49,11 +48,11 @@ role :db,  ip_address, :primary => true
 task :after_update_code, :roles => [:web, :db, :app] do
   run "chmod 755 #{release_path}/public"
   run "chown admin:admin #{release_path} -R"
-  begin
-    run "rm -f #{release_path}/config/database.yml"
-  rescue Exception => error
-  end
-  run "ln -s #{shared_directory}/database.yml #{release_path}/config/database.yml"
+  # begin
+  #   run "rm -f #{release_path}/config/database.yml"
+  # rescue Exception => error
+  # end
+  # run "ln -s #{shared_directory}/database.yml #{release_path}/config/database.yml"
 end
 
 namespace :deploy do
