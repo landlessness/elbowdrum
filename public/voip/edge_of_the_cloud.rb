@@ -93,7 +93,7 @@ end
 
 say("Welcome to Edge of the Cloud, thoughts from Chet Kapoor, CEO of Sonoa Systems.")
 
-say("Please wait while we retrieve the latest headline news for #{Time.now.strftime("%m/%d/%y")}")
+say("Please wait while we retrieve Chet's newest blog posts")
 
 f1 = EdgeOfTheCloud.new()
 f1.getFeed
