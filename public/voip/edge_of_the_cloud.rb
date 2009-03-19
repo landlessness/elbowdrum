@@ -86,7 +86,7 @@ class EdgeOfTheCloud
                 break
             end
             
-            wait(1000)
+            wait(3000)
         end
     end
 end    
