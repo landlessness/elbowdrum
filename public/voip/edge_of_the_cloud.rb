@@ -12,17 +12,15 @@ wait(1000)
 class EdgeOfTheCloud
 
     def getFeed
-        res = Net::HTTP.start('edgeofthecloud.com') {|http|
-	        http.get('/?feed=rss2')
-        }
+        res = Net::HTTP.start('edgeofthecloud.com') {|http|  http.get('/?feed=rss2') }
         result = REXML::Document.new(res.body)
         @titles = []
         @descriptions = []
         result.elements.each('rss/channel/item/description') do |ele|
-            @titles << ele.text
+            @descriptions << ele.text.gsub(/[^\w\.\s-]/,'') # .gsub(/[^\w\.\s-]/,'')
         end
         result.elements.each('rss/channel/item/title') do |ele|
-            @descriptions << ele.text
+            @titles << ele.text.gsub(/[^\w\.\s-]/,'')
         end
     end
 
