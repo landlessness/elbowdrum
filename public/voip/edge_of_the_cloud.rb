@@ -17,10 +17,10 @@ class EdgeOfTheCloud
         @titles = []
         @descriptions = []
         result.elements.each('rss/channel/item/description') do |ele|
-            @descriptions << ele.text.gsub(/[^\w\.\s-]/,'').gsub('...','. end of excerpt.')
+            @descriptions << ele.text.gsub(/[^\w\.\s-]/,'')
         end
         result.elements.each('rss/channel/item/title') do |ele|
-            @titles << ele.text.gsub(/[^\w\.\s-]/,'').gsub('...','. end of excerpt.')
+            @titles << ele.text.gsub(/[^\w\.\s-]/,'')
         end
     end
 
@@ -43,6 +43,8 @@ class EdgeOfTheCloud
                       event.onHangup( lambda { option = 'end' } )
                       event.onBadChoice( lambda { say "bad choice" } )}
                 })
+                wait(1000)
+                say('end of excerpt.')
             else
                 result=prompt("#{@titles[currentIndex]}",
                 {'silenceTimeout'=> 1,
@@ -96,5 +98,7 @@ say("Please wait while we retrieve Chet's latest thoughts")
 f1 = EdgeOfTheCloud.new()
 f1.getFeed
 f1.playFeed
-
+say('thank you for checking in with edge of the cloud')
+wait(1000)
+say('good bye')
 hangup
