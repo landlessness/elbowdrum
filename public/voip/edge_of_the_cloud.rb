@@ -25,7 +25,7 @@ class EdgeOfTheCloud
     end
 
     def playFeed
-        say ("There are #{@titles.size} thoughts.  Press 1 to move to the next thought.  Press 2 to go back to the previous thought.  Press 3 to repeat the title of a thought.   Press 4 to listen to an excerpt of the thought.  Press 0 to end.")
+        say ("There are #{@titles.size} thoughts.  Press 1 to skip to the next thought.  Press 4 to listen to an excerpt.  Press 0 to end.")
 
         detail = false
         currentIndex = 0
