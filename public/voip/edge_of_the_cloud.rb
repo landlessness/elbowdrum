@@ -17,15 +17,15 @@ class EdgeOfTheCloud
         @titles = []
         @descriptions = []
         result.elements.each('rss/channel/item/description') do |ele|
-            @descriptions << ele.text.gsub(/[^\w\.\s-]/,'') # .gsub(/[^\w\.\s-]/,'')
+            @descriptions << ele.text.gsub(/[^\w\.\s-]/,'').gsub('...','. end of excerpt.')
         end
         result.elements.each('rss/channel/item/title') do |ele|
-            @titles << ele.text.gsub(/[^\w\.\s-]/,'')
+            @titles << ele.text.gsub(/[^\w\.\s-]/,'').gsub('...','. end of excerpt.')
         end
     end
 
     def playFeed
-        say ("There are #{@titles.size} thoughts.  Press 1 to move to the next thought.  Press 2 to go back to the previous thought.  Press 3 to repeat the title of a thought.   Press 4 to listen to the full thought.  Press 0 to end.")
+        say ("There are #{@titles.size} thoughts.  Press 1 to move to the next thought.  Press 2 to go back to the previous thought.  Press 3 to repeat the title of a thought.   Press 4 to listen to an excerpt of the thought.  Press 0 to end.")
 
         detail = false
         currentIndex = 0
