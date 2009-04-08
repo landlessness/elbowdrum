@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090107213756) do
+ActiveRecord::Schema.define(:version => 20090408140707) do
 
   create_table "account_memberships", :force => true do |t|
     t.integer  "account_id"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(:version => 20090107213756) do
     t.datetime "deleted_at"
     t.string   "time_zone"
     t.integer  "current_email_id"
+    t.integer  "current_account_id"
   end
 
   add_index "people", ["login"], :name => "index_people_on_login", :unique => true
