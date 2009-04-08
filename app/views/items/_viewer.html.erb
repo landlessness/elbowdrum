@@ -1,5 +1,5 @@
 <div class="item-list">
   <ul id="<%= element_id(account_membership, time_frame, item_type, 'list') %>">
-    <%= render :partial => 'items/item', :collection => items %>
+    <%= render :partial => 'items/item', :collection => items, :locals => {:account_membership => account_membership} %>
   </ul>
 </div>

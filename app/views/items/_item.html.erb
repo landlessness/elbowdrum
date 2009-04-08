@@ -1,3 +1,6 @@
-<li class="underline">
-  <span class="item-text"><%= auto_link_membership item.text %></span>
+<li class="underline" id="item_<%= item.id %>">
+  <span class="item-text">
+    <%= auto_link_membership item.text %>
+    <%= link_to_remote 'x', :update => 'items', :url => account_account_membership_item_path(account_membership.account, account_membership, item), :method => :delete %>
+  </span>
 </li>

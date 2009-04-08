@@ -8,6 +8,9 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :accounts do |a|
     a.resources :account_memberships do |m|
       m.resources :items
+      m.resources :deeds
+      m.resources :daily_promises
+      m.resources :blockers
     end
     a.resources :items
     a.day 'items/:year/:month/:day', :controller => 'items',

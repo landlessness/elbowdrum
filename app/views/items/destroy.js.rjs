@@ -1,0 +1,1 @@
+page.remove 'item_' + @item_id.to_s

@@ -89,11 +89,13 @@ class ItemsController < ApplicationController
   # DELETE /items/1
   # DELETE /items/1.xml
   def destroy
-    @item = Item.find(params[:id])
+    @item_id = params[:id]
+    @item = Item.find(@item_id)
     @item.destroy
 
     respond_to do |format|
-      format.html { redirect_to(items_url) }
+      format.js
+      format.html { redirect_to('/') }
       format.xml  { head :ok }
     end
   end

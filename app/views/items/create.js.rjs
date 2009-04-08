@@ -1,2 +1,2 @@
-page.insert_html :bottom, :"#{element_id(@account_membership, :today, @item.class, 'list')}", :partial => 'item', :object => @item
+page.insert_html :bottom, :"#{element_id(@account_membership, :today, @item.class, 'list')}", :partial => 'item', :object => @item, :locals => {:account_membership => @account_membership}
 page[element_id(@account_membership, :today, @item.class, 'text')].value = ''
