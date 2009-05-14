@@ -12,7 +12,7 @@ development:
   api_key: 7335f7df8964439d94a1be6821661126
   secret_key: 115d42cfba5c390aabb1f0756af1ca02
   canvas_page_name: open_stream_growl
-  callback_url: http://elbowdrum/sandbox
+  callback_url: http://elbowdrum
   pretty_errors: true
   set_asset_host_to_callback_url: true
   tunnel:
@@ -26,7 +26,7 @@ test:
   api_key: 7335f7df8964439d94a1be6821661126
   secret_key: 115d42cfba5c390aabb1f0756af1ca02
   canvas_page_name: open_stream_growl
-  callback_url: http://elbowdrum/sandbox
+  callback_url: http://elbowdrum
   pretty_errors: true
   set_asset_host_to_callback_url: true
   tunnel:
@@ -40,7 +40,7 @@ production:
   api_key: 7335f7df8964439d94a1be6821661126
   secret_key: 115d42cfba5c390aabb1f0756af1ca02
   canvas_page_name: open_stream_growl
-  callback_url: http://elbowdrum/sandbox
+  callback_url: http://elbowdrum
   pretty_errors: true
   set_asset_host_to_callback_url: true
   tunnel:
