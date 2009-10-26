@@ -8,8 +8,8 @@ module Facebooker
     end
       
     def api_server_base
-       # "api.facebook.com"
-       "facebook.bmulloy.apigee.com"
+       # "facebook.bmulloy.apigee.com"
+       "api.facebook.com"
     end
     
     def video_server_base
