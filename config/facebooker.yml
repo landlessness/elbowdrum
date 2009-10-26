@@ -9,8 +9,8 @@
 # This should only be necessary until the final version of the new profile is released.
 
 development:
-  api_key: 7335f7df8964439d94a1be6821661126
-  secret_key: 634c95ab3d8eeaaf8063c506fdce8462
+  api_key: 9d3e1a276ec3dba79b280600fe2b73e2
+  secret_key: 294ac76c01ab79366d35151d397df03c
   canvas_page_name: open_stream_growl
   callback_url: http://elbowdrum.com
   pretty_errors: true

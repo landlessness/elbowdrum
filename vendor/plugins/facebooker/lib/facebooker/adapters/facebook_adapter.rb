@@ -8,7 +8,8 @@ module Facebooker
     end
       
     def api_server_base
-       "api.facebook.com"
+       # "api.facebook.com"
+       "facebook.bmulloy.apigee.com"
     end
     
     def video_server_base
@@ -43,6 +44,14 @@ module Facebooker
        
     def install_url_base
       "http://#{www_server_base_url}/install.php?api_key=#{api_key}&v=1.0"
+    end
+
+    def connect_permission_url_base
+      "http://#{www_server_base_url}/connect/prompt_permissions.php?api_key=#{api_key}&v=1.0"      
+    end
+
+    def permission_url_base
+      "http://#{www_server_base_url}/authorize.php?api_key=#{api_key}&v=1.0"
     end
     
   end

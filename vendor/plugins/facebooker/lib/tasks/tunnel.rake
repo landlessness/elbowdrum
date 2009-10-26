@@ -27,8 +27,8 @@ namespace :facebooker do
     end
 
     task :config => :environment do
-     facebook_config = File.dirname(__FILE__) + '/../../../../../config/facebooker.yml'
-     FACEBOOKER = YAML.load_file(facebook_config)[RAILS_ENV]
+     facebook_config = File.join(RAILS_ROOT, 'config', 'facebooker.yml')
+     FACEBOOKER = YAML.load(ERB.new(File.read(facebook_config)).result)[RAILS_ENV]
      @public_host_username = FACEBOOKER['tunnel']['public_host_username'] 
      @public_host = FACEBOOKER['tunnel']['public_host'] 
      @public_port = FACEBOOKER['tunnel']['public_port'] 

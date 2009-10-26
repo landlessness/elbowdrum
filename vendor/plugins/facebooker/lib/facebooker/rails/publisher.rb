@@ -4,7 +4,7 @@ module Facebooker
     # 
     # To use, create a subclass and define methods
     # Each method should start by calling send_as to specify the type of message
-    # Valid options are  :email and :notification, :user_action, :profile, :ref
+    # Valid options are  :email and :notification, :user_action, :profile, :ref, :publish_stream
     # 
     #
     # Below is an example of each type
@@ -56,15 +56,15 @@ module Facebooker
     #       fbml 'text'
     #       text fbml
     #     end
-    #     # This will render the profile in /users/profile.erb
+    #     # This will render the profile in /users/profile.fbml.erb
     #     #   it will set @user to user_to_update in the template
     #     #  The mobile profile will be rendered from the app/views/test_publisher/_mobile.erb
     #     #   template
     #     def profile_update(user_to_update,user_with_session_to_use)
     #       send_as :profile
     #       from user_with_session_to_use
-    #       to user_to_update
-    #       profile render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       recipients user_to_update
+    #       profile render(:file=>"users/profile.fbml.erb",:assigns=>{:user=>user_to_update})
     #       profile_action "A string"
     #       mobile_profile render(:partial=>"mobile",:assigns=>{:user=>user_to_update})
     #   end
@@ -74,9 +74,19 @@ module Facebooker
     #     def ref_update(user)
     #       send_as :ref
     #       from user
-    #       fbml render(:action=>"/users/profile",:assigns=>{:user=>user_to_update})
+    #       fbml render(:file=>"users/profile",:assigns=>{:user=>user_to_update})
     #       handle "a_ref_handle"
     #   end
+    #
+    #     #  Publish a post into the stream on the user's Wall and News Feed.
+    #     def publish_stream(user_with_session_to_use, user_to_update, params)
+    #       send_as :publish_stream
+    #       from  user_with_session_to_use
+    #       target user_to_update
+    #       attachment params[:attachment]
+    #       message params[:message]
+    #       action_links params[:action_links]
+    #     end
     #
     #
     # To send a message, use ActionMailer like semantics
@@ -98,7 +108,15 @@ module Facebooker
         @from                 = nil
         @full_story_template  = nil
         @recipients           = nil
-        @controller           = PublisherController.new
+        @controller           = PublisherController.new(self)
+      end
+
+      def self.default_url_options
+        {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
+      end
+
+      def default_url_options
+        self.class.default_url_options
       end
 
       # use facebook options everywhere
@@ -122,12 +140,22 @@ module Facebooker
           end
         end
         
+        def deactivate
+          Facebooker::Session.create.deactivate_template_bundle_by_id(self.bundle_id)
+          return true
+        rescue Facebooker::Session::TemplateBundleInvalid => e
+          return false
+        end
+
+        
+        
         class << self
           
           def register(klass,method)
             publisher = setup_publisher(klass,method)            
             template_id = Facebooker::Session.create.register_template_bundle(publisher.one_line_story_templates,publisher.short_story_templates,publisher.full_story_template,publisher.action_links)
             template = find_or_initialize_by_template_name(template_name(klass,method))
+            template.deactivate if template.bundle_id  # deactivate old templates to avoid exceeding templates/app limit
             template.bundle_id = template_id
             template.content_hash = hashed_content(klass,method) if template.respond_to?(:content_hash)
             template.save!
@@ -156,12 +184,8 @@ module Facebooker
           
           def find_in_db(klass,method)
             template = find_by_template_name(template_name(klass,method))
-            if template and template.template_changed?(hashed_content(klass,method))
-              template.destroy
-              template = nil
-            end
             
-            if template.nil?
+            if template.nil? || template.template_changed?(hashed_content(klass, method))
               template = register(klass,method)
             end
             template
@@ -183,7 +207,7 @@ module Facebooker
           end
 
           def template_name(klass,method)
-            "#{klass.name}::#{method}"
+            "#{Facebooker.api_key}: #{klass.name}::#{method}"
           end
         end
       end
@@ -236,6 +260,13 @@ module Facebooker
         end
       end
 
+      class PublishStream
+        attr_accessor :target
+        attr_accessor :attachment
+        attr_accessor :action_links
+        attr_accessor :message
+      end
+
       cattr_accessor :ignore_errors
       attr_accessor :_body
 
@@ -274,6 +305,8 @@ module Facebooker
           Ref.new
         when :user_action
           UserAction.new
+        when :publish_stream
+          PublishStream.new
         else
           raise UnknownBodyType.new("Unknown type to publish")
         end
@@ -385,6 +418,8 @@ module Facebooker
           Facebooker::Session.create.server_cache.set_ref_handle(_body.handle,_body.fbml)
         when UserAction
           @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general,_body.story_size)
+        when PublishStream
+         @from.publish_to(_body.target, {:attachment => _body.attachment, :action_links => @action_links, :message => _body.message })
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end
@@ -415,8 +450,11 @@ module Facebooker
 	          ActionController::Base.append_view_path(controller_root) 
 	          ActionController::Base.append_view_path(controller_root+"/..") 
 	        end
+          view_paths = ActionController::Base.view_paths
+        else
+          view_paths = [template_root, controller_root]
 	      end
-        returning ActionView::Base.new([template_root,controller_root], assigns, self) do |template|
+        returning ActionView::Base.new(view_paths, assigns, self) do |template|
           template.controller=self
           template.extend(self.class.master_helper_module)
           def template.request_comes_from_facebook?
@@ -453,6 +491,13 @@ module Facebooker
       ActionController::Routing::Routes.named_routes.install(self.master_helper_module)
       include self.master_helper_module
       class <<self
+
+        def register_all_templates_on_all_applications
+          Facebooker.with_all_applications do
+            puts "Registering templates for #{Facebooker.api_key}"
+            register_all_templates
+          end
+        end
         
         def register_all_templates
           all_templates = instance_methods.grep(/_template$/) - %w(short_story_template full_story_template one_line_story_template) 
@@ -460,6 +505,15 @@ module Facebooker
             template_name=template.sub(/_template$/,"")
             puts "Registering #{template_name}"
             send("register_"+template_name)
+          end
+        end
+        
+        def unregister_inactive_templates
+          session = Facebooker::Session.create
+          active_template_ids = FacebookTemplate.all.map(&:bundle_id)
+          all_template_ids = session.active_template_bundles.map {|t| t["template_bundle_id"]}
+          (all_template_ids - active_template_ids).each do |template_bundle_id|
+            session.deactivate_template_bundle_by_id(template_bundle_id)
           end
         end
         
@@ -487,11 +541,7 @@ module Facebooker
           
           should_send ? publisher.send_message(method) : publisher._body
         end
-    
-        def default_url_options
-          {:host => Facebooker.canvas_server_base + Facebooker.facebook_path_prefix}
-        end
-    
+        
         def controller_path
           self.to_s.underscore
         end
@@ -500,7 +550,7 @@ module Facebooker
           args.each do |arg|
             case arg
             when Symbol,String
-              add_template_helper("#{arg.to_s.classify}Helper".constantize)
+              add_template_helper("#{arg.to_s.camelcase}Helper".constantize)
             when Module
               add_template_helper(arg)
             end
@@ -525,11 +575,16 @@ module Facebooker
       class PublisherController
         include Facebooker::Rails::Publisher.master_helper_module
         include ActionController::UrlWriter
+        
+        def initialize(source)
+          self.class.url_option_source = source
+        end
 
         class << self
+          attr_accessor :url_option_source
           alias :old_default_url_options :default_url_options
           def default_url_options(*args)
-            Facebooker::Rails::Publisher.default_url_options(*args)
+            url_option_source.default_url_options(*args)
           end
         end
 

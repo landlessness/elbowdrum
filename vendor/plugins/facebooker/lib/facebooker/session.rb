@@ -50,6 +50,7 @@ module Facebooker
     class FQLStatementNotIndexable < StandardError; end
     class FQLFunctionDoesNotExist < StandardError; end
     class FQLWrongNumberArgumentsPassedToFunction < StandardError; end
+    class PermissionError < StandardError; end
     class InvalidAlbumId < StandardError; end
     class AlbumIsFull < StandardError; end
     class MissingOrInvalidImageFile < StandardError; end
@@ -72,6 +73,7 @@ module Facebooker
 
     attr_writer :auth_token
     attr_reader :session_key
+    attr_reader :secret_from_session
 
     def self.create(api_key=nil, secret_key=nil)
       api_key ||= self.api_key
@@ -98,11 +100,11 @@ module Facebooker
 
     def login_url(options={})
       options = default_login_url_options.merge(options)
-      "#{Facebooker.login_url_base(@api_key)}#{login_url_optional_parameters(options)}"
+      "#{Facebooker.login_url_base}#{login_url_optional_parameters(options)}"
     end
 
     def install_url(options={})
-      "#{Facebooker.install_url_base(@api_key)}#{install_url_optional_parameters(options)}"
+      "#{Facebooker.install_url_base}#{install_url_optional_parameters(options)}"
     end
 
     # The url to get user to approve extended permissions
@@ -120,7 +122,16 @@ module Facebooker
     # * sms
     def permission_url(permission,options={})
       options = default_login_url_options.merge(options)
-      "http://#{Facebooker.www_server_base_url}/authorize.php?api_key=#{@api_key}&v=1.0&ext_perm=#{permission}#{install_url_optional_parameters(options)}"
+      options = add_next_parameters(options)
+      options << "&ext_perm=#{permission}"
+      "#{Facebooker.permission_url_base}#{options.join}"
+    end
+
+    def connect_permission_url(permission,options={})
+      options = default_login_url_options.merge(options)
+      options = add_next_parameters(options)
+      options << "&ext_perm=#{permission}"
+      "#{Facebooker.connect_permission_url_base}#{options.join}"
     end
 
     def install_url_optional_parameters(options)
@@ -143,6 +154,8 @@ module Facebooker
       optional_parameters << "&skipcookie=true" if options[:skip_cookie]
       optional_parameters << "&hide_checkbox=true" if options[:hide_checkbox]
       optional_parameters << "&canvas=true" if options[:canvas]
+      optional_parameters << "&fbconnect=true" if options[:fbconnect]
+      optional_parameters << "&req_perms=#{options[:req_perms]}" if options[:req_perms]
       optional_parameters.join
     end
 
@@ -181,10 +194,14 @@ module Facebooker
       !@session_key.nil? && !expired?
     end
 
-    def secure!
-      response = post 'facebook.auth.getSession', :auth_token => auth_token
+    def secure!(args = {})
+      response = post 'facebook.auth.getSession', :auth_token => auth_token, :generate_session_secret => args[:generate_session_secret] ? "1" : "0"
       secure_with!(response['session_key'], response['uid'], response['expires'], response['secret'])
     end    
+    
+    def secure_with_session_secret!
+      self.secure!(:generate_session_secret => true)
+    end
 
     def secure_with!(session_key, uid = nil, expires = nil, secret_from_session = nil)
       @session_key = session_key
@@ -193,30 +210,59 @@ module Facebooker
       @secret_from_session = secret_from_session
     end
 
+    def fql_build_object(type, hash)
+      case type
+      when 'user'
+        user = User.new
+        user.session = self
+        user.populate_from_hash!(hash)
+        user
+      when 'photo'
+        Photo.from_hash(hash)
+      when 'album'
+        Album.from_hash(hash)
+      when 'page'
+        Page.from_hash(hash)
+      when 'page_admin'
+        Page.from_hash(hash)
+      when 'group'
+        Group.from_hash(hash)
+      when 'event'
+        Event.from_hash(hash)
+      when 'event_member'
+        Event::Attendance.from_hash(hash)
+      else
+        hash
+      end
+    end
+
     def fql_query(query, format = 'XML')
       post('facebook.fql.query', :query => query, :format => format) do |response|
         type = response.shift
         return [] if type.nil?
         response.shift.map do |hash|
-          case type
-          when 'user'
-            user = User.new
-            user.session = self
-            user.populate_from_hash!(hash)
-            user
-          when 'photo'
-            Photo.from_hash(hash)
-          when 'page'
-            Page.from_hash(hash)
-          when 'page_admin'
-            Page.from_hash(hash)
-          when 'event_member'
-            Event::Attendance.from_hash(hash)
-          else
-            hash
-          end
+          fql_build_object(type, hash)
         end
       end
+    end
+
+    def fql_multiquery(queries, format = 'XML')
+      results = {}
+      post('facebook.fql.multiquery', :queries => queries.to_json, :format => format) do |responses|
+        responses.each do |response|
+          name = response.shift
+          response = response.shift
+          type = response.shift
+          value = [] 
+          unless type.nil?
+            value = response.shift.map do |hash|
+              fql_build_object(type, hash)
+            end
+          end
+          results[name] = value
+        end
+      end
+      results
     end
 
     def user
@@ -231,15 +277,34 @@ module Facebooker
     # :end_time => Filter with this UTC as upper bound. A missing or zero parameter indicates no upper bound. (Time or Integer)
     # :rsvp_status => Filter by this RSVP status.
     def events(options = {})
-      @events ||= post('facebook.events.get', options) do |response|
+      @events ||= {}
+      @events[options.to_s] ||= post('facebook.events.get', options) do |response|
         response.map do |hash|
           Event.from_hash(hash)
         end
       end
     end
 
+    # Creates an event with the event_info hash and an optional Net::HTTP::MultipartPostFile for the event picture
+    # Returns the eid of the newly created event
+    # http://wiki.developers.facebook.com/index.php/Events.create
+    def create_event(event_info, multipart_post_file = nil)
+      post_file('facebook.events.create', :event_info => event_info.to_json, nil => multipart_post_file)
+    end
+    
+    # Cancel an event
+    # http://wiki.developers.facebook.com/index.php/Events.cancel
+    # E.g:
+    #  @session.cancel_event('100321123', :cancel_message => "It's raining...")
+    #  # => Returns true if all went well
+    def cancel_event(eid, options = {})
+      result = post('facebook.events.cancel', options.merge(:eid => eid))
+      result == '1' ? true : false
+    end
+
     def event_members(eid)
-      @members ||= post('facebook.events.getMembers', :eid => eid) do |response|
+      @members ||= {}
+      @members[eid] ||= post('facebook.events.getMembers', :eid => eid) do |response|
         response.map do |attendee_hash|
           Event::Attendance.from_hash(attendee_hash)
         end
@@ -270,8 +335,10 @@ module Facebooker
 
     # Takes page_id and uid, returns true if uid is a fan of the page_id
     def is_fan(page_id, uid)
-      post('facebook.pages.isFan', :page_id=>page_id, :uid=>uid)
+      puts "Deprecated. Use Page#user_is_fan? instead"
+      Page.new(page_id).user_is_fan?(uid)
     end    
+
 
     #
     # Returns a proxy object for handling calls to Facebook cached items
@@ -288,6 +355,10 @@ module Facebooker
 
     def admin
       Facebooker::Admin.new(self)
+    end
+    
+    def application
+      Facebooker::Application.new(self)
     end
 
     def mobile
@@ -314,7 +385,9 @@ module Facebooker
       if [subj_id, pids, aid].all? {|arg| arg.nil?}
         raise ArgumentError, "Can't get a photo without a picture, album or subject ID" 
       end
-      @photos = post('facebook.photos.get', :subj_id => subj_id, :pids => pids, :aid => aid ) do |response|
+      # We have to normalize params orherwise FB complain about signature
+      params = {:pids => pids, :subj_id => subj_id, :aid => aid}.delete_if { |k,v| v.nil? }
+      @photos = post('facebook.photos.get', params ) do |response|
         response.map do |hash|
           Photo.from_hash(hash)
         end
@@ -362,15 +435,35 @@ module Facebooker
     # Register a template bundle with Facebook.
     # returns the template id to use to send using this template
     def register_template_bundle(one_line_story_templates,short_story_templates=nil,full_story_template=nil, action_links=nil)
-      parameters = {:one_line_story_templates => Array(one_line_story_templates).to_json}
-
-      parameters[:action_links] = action_links.to_json unless action_links.blank?
-
-      parameters[:short_story_templates] = Array(short_story_templates).to_json unless short_story_templates.blank?
-
-      parameters[:full_story_template] = full_story_template.to_json unless full_story_template.blank?
-
+      templates = ensure_array(one_line_story_templates)
+      parameters = {:one_line_story_templates => templates.to_json}
+      
+      unless action_links.blank?
+        parameters[:action_links] = action_links.to_json
+      end
+      
+      unless short_story_templates.blank?
+        templates = ensure_array(short_story_templates)
+        parameters[:short_story_templates] = templates.to_json
+      end
+      
+      unless full_story_template.blank?
+        parameters[:full_story_template] = full_story_template.to_json
+      end
+      
       post("facebook.feed.registerTemplateBundle", parameters, false)
+    end
+
+    ##
+    # Deactivate a template bundle with Facebook.
+    # Returns true if a bundle with the specified id is active and owned by this app.
+    # Useful to avoid exceeding the 100 templates/app limit.
+    def deactivate_template_bundle_by_id(template_bundle_id)
+      post("facebook.feed.deactivateTemplateBundleByID", {:template_bundle_id => template_bundle_id.to_s}, false)
+    end
+
+    def active_template_bundles
+      post("facebook.feed.getRegisteredTemplateBundles",{},false)
     end
 
     ##
@@ -388,10 +481,10 @@ module Facebooker
 
     ##
     # Send email to as many as 100 users at a time
-    def send_email(user_ids, subject, text, fbml = nil) 			
+    def send_email(user_ids, subject, text, fbml = nil)       
       user_ids = Array(user_ids)
       params = {:fbml => fbml, :recipients => user_ids.map{ |id| User.cast_to_facebook_id(id)}.join(','), :text => text, :subject => subject} 
-      post 'facebook.notifications.sendEmail', params
+      post 'facebook.notifications.sendEmail', params, false
     end
 
     # Only serialize the bare minimum to recreate the session.
@@ -521,7 +614,7 @@ module Facebooker
     end
 
     def post(method, params = {}, use_session_key = true, &proc)
-      if batch_request?
+      if batch_request? or Facebooker::Logging.skip_api_logging
         post_without_logging(method, params, use_session_key, &proc)
       else
         Logging.log_fb_api(method, params) do
@@ -595,6 +688,10 @@ module Facebooker
           collection
         end.sort.join
         Digest::MD5.hexdigest([raw_string, secret_for_method(params[:method])].join)
+      end
+      
+      def ensure_array(value)
+        value.is_a?(Array) ? value : [value]
       end
   end
 
