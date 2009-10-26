@@ -34,6 +34,7 @@ set :database_name , "bmulloy2_prod" # !NOTE! this is limited to 9 characters
 ###### There is no need to edit anything below this line ######
 
 set :user , "root"
+set :password, "i7y5EMftO4E"
 set :domain_password, "i7y5EMftO4E"
 set :deploy_to, "/home/admin/#{application}"
 set :shared_directory, "#{deploy_to}/shared"
