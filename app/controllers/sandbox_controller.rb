@@ -3,7 +3,4 @@ class SandboxController < ApplicationController
   def index 
     @current_facebook_user = facebook_session.user
   end
-  def user_info
-    
-  end
 end

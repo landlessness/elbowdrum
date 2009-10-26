@@ -11,8 +11,8 @@
 development:
   api_key: 9d3e1a276ec3dba79b280600fe2b73e2
   secret_key: 294ac76c01ab79366d35151d397df03c
-  canvas_page_name: open_stream_growl
-  callback_url: http://elbowdrum.com
+  canvas_page_name: apigeesandbox
+  callback_url: http://elbowdrum.com/sandbox
   pretty_errors: true
   set_asset_host_to_callback_url: true
   tunnel:
